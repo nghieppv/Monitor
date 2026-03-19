@@ -76,13 +76,13 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
           <CardDescription>Capture legal and operational ownership details for monitored services.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={submit}>
-            <Input placeholder="Company name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-            <Input placeholder="Tax code" value={form.tax_code} onChange={(e) => setForm({ ...form, tax_code: e.target.value })} />
-            <Input placeholder="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            <Textarea placeholder="Notes" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+          <form className="space-y-4" onSubmit={submit} data-testid="company-form">
+            <Input data-testid="company-name-input" placeholder="Company name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <Input data-testid="company-tax-code-input" placeholder="Tax code" value={form.tax_code} onChange={(e) => setForm({ ...form, tax_code: e.target.value })} />
+            <Input data-testid="company-address-input" placeholder="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Textarea data-testid="company-note-input" placeholder="Notes" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
             <div className="flex gap-3">
-              <Button type="submit" disabled={busy}>
+              <Button data-testid="company-submit-button" type="submit" disabled={busy}>
                 <Plus className="mr-2 h-4 w-4" />
                 {editingId ? "Update company" : "Create company"}
               </Button>
@@ -122,17 +122,17 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
               </TableHeader>
               <TableBody>
                 {companies.map((company) => (
-                  <TableRow key={company.id}>
+                  <TableRow key={company.id} data-testid={`company-row-${company.name}`}>
                     <TableCell className="font-medium text-slate-900">{company.name}</TableCell>
                     <TableCell>{company.taxCode || "-"}</TableCell>
                     <TableCell>{company.address || "-"}</TableCell>
                     <TableCell>{company._count.endpoints}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => edit(company)}>
+                        <Button data-testid="company-edit-button" size="sm" variant="outline" onClick={() => edit(company)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => remove(company.id)}>
+                        <Button data-testid="company-delete-button" size="sm" variant="destructive" onClick={() => remove(company.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

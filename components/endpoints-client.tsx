@@ -83,27 +83,27 @@ export function EndpointsClient({ initialEndpoints, companies }: { initialEndpoi
           <CardDescription>Register websites and APIs that should be checked on every cycle.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={submit}>
-            <Select value={form.companyId} onChange={(e) => setForm({ ...form, companyId: e.target.value })}>
+          <form className="space-y-4" onSubmit={submit} data-testid="endpoint-form">
+            <Select data-testid="endpoint-company-select" value={form.companyId} onChange={(e) => setForm({ ...form, companyId: e.target.value })}>
               {companies.map((company) => (
                 <option key={company.id} value={company.id}>
                   {company.name}
                 </option>
               ))}
             </Select>
-            <Input placeholder="https://service.example.com/health" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} required />
+            <Input data-testid="endpoint-url-input" placeholder="https://service.example.com/health" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} required />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "web" | "api" })}>
+              <Select data-testid="endpoint-type-select" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "web" | "api" })}>
                 <option value="web">Web</option>
                 <option value="api">API</option>
               </Select>
-              <Select value={String(form.active)} onChange={(e) => setForm({ ...form, active: e.target.value === "true" })}>
+              <Select data-testid="endpoint-active-select" value={String(form.active)} onChange={(e) => setForm({ ...form, active: e.target.value === "true" })}>
                 <option value="true">Active</option>
                 <option value="false">Paused</option>
               </Select>
             </div>
             <div className="flex gap-3">
-              <Button type="submit" disabled={busy}>
+              <Button data-testid="endpoint-submit-button" type="submit" disabled={busy}>
                 <Plus className="mr-2 h-4 w-4" />
                 {editingId ? "Update endpoint" : "Create endpoint"}
               </Button>
@@ -145,7 +145,7 @@ export function EndpointsClient({ initialEndpoints, companies }: { initialEndpoi
               </TableHeader>
               <TableBody>
                 {endpoints.map((endpoint) => (
-                  <TableRow key={endpoint.id}>
+                  <TableRow key={endpoint.id} data-testid={`endpoint-row-${endpoint.url}`}>
                     <TableCell className="font-medium text-slate-900">{endpoint.company.name}</TableCell>
                     <TableCell className="font-mono text-xs text-slate-600">{endpoint.url}</TableCell>
                     <TableCell className="uppercase text-slate-600">{endpoint.type}</TableCell>
@@ -156,10 +156,10 @@ export function EndpointsClient({ initialEndpoints, companies }: { initialEndpoi
                     <TableCell>{formatDateTime(endpoint.lastCheckedAt)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => edit(endpoint)}>
+                        <Button data-testid="endpoint-edit-button" size="sm" variant="outline" onClick={() => edit(endpoint)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => remove(endpoint.id)}>
+                        <Button data-testid="endpoint-delete-button" size="sm" variant="destructive" onClick={() => remove(endpoint.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

@@ -56,42 +56,47 @@ export function SettingsClient({ initialSettings }: { initialSettings: Settings 
           <CardDescription>Send notifications when services go down and when they recover.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={submit}>
+          <form className="space-y-4" onSubmit={submit} data-testid="settings-form">
             <Input
+              data-testid="settings-telegram-token-input"
               placeholder="Telegram bot token"
               value={form.telegramBotToken}
               onChange={(e) => setForm({ ...form, telegramBotToken: e.target.value })}
             />
             <Input
+              data-testid="settings-telegram-chat-id-input"
               placeholder="Telegram chat id"
               value={form.telegramChatId}
               onChange={(e) => setForm({ ...form, telegramChatId: e.target.value })}
             />
             <div className="grid gap-4 sm:grid-cols-3">
               <Input
+                data-testid="settings-interval-input"
                 type="number"
                 placeholder="Interval"
                 value={form.intervalSeconds}
                 onChange={(e) => setForm({ ...form, intervalSeconds: e.target.value })}
               />
               <Input
+                data-testid="settings-timeout-input"
                 type="number"
                 placeholder="Timeout"
                 value={form.timeoutMs}
                 onChange={(e) => setForm({ ...form, timeoutMs: e.target.value })}
               />
               <Input
+                data-testid="settings-warning-threshold-input"
                 type="number"
                 placeholder="Warning threshold"
                 value={form.warningThreshold}
                 onChange={(e) => setForm({ ...form, warningThreshold: e.target.value })}
               />
             </div>
-            <Button type="submit" disabled={busy}>
+            <Button data-testid="settings-submit-button" type="submit" disabled={busy}>
               <Save className="mr-2 h-4 w-4" />
               Save settings
             </Button>
-            {message ? <p className="text-sm text-slate-600">{message}</p> : null}
+            {message ? <p data-testid="form-message" className="text-sm text-slate-600">{message}</p> : null}
           </form>
         </CardContent>
       </Card>

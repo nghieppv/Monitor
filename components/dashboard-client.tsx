@@ -52,7 +52,7 @@ export function DashboardClient({ initialData }: { initialData: DashboardData })
           const value = data.summary[card.key];
 
           return (
-            <Card key={card.key} className="overflow-hidden border-0 bg-white">
+            <Card key={card.key} className="overflow-hidden border-0 bg-white" data-testid={`summary-${card.key}`}>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
                   <p className="text-sm text-slate-500">{card.label}</p>
@@ -76,14 +76,14 @@ export function DashboardClient({ initialData }: { initialData: DashboardData })
             </CardDescription>
           </div>
           <div className="flex flex-col gap-3 md:flex-row">
-            <Select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <Select data-testid="dashboard-status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
               <option value="ALL">All statuses</option>
               <option value="OK">OK</option>
               <option value="WARNING">Warning</option>
               <option value="DOWN">Down</option>
               <option value="UNKNOWN">Unknown</option>
             </Select>
-            <Select value={companyFilter} onChange={(event) => setCompanyFilter(event.target.value)}>
+            <Select data-testid="dashboard-company-filter" value={companyFilter} onChange={(event) => setCompanyFilter(event.target.value)}>
               <option value="ALL">All companies</option>
               {data.companies.map((company) => (
                 <option key={company.id} value={company.id}>
@@ -91,11 +91,11 @@ export function DashboardClient({ initialData }: { initialData: DashboardData })
                 </option>
               ))}
             </Select>
-            <Button variant="outline" onClick={() => refresh(false)} disabled={pending}>
+            <Button data-testid="dashboard-refresh-button" variant="outline" onClick={() => refresh(false)} disabled={pending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${pending ? "animate-spin" : ""}`} />
               Refresh
             </Button>
-            <Button onClick={() => refresh(true)} disabled={pending}>
+            <Button data-testid="dashboard-run-checks-button" onClick={() => refresh(true)} disabled={pending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${pending ? "animate-spin" : ""}`} />
               Run checks
             </Button>
@@ -103,7 +103,7 @@ export function DashboardClient({ initialData }: { initialData: DashboardData })
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
+            <Table data-testid="dashboard-table">
               <TableHeader>
                 <TableRow>
                   <TableHead>Company</TableHead>

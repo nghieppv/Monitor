@@ -23,6 +23,7 @@ Production-structured monitoring dashboard built with Next.js App Router, Tailwi
 
 ```bash
 npm install
+npx playwright install --with-deps chromium
 npm run prisma:generate
 npm run prisma:push
 npm run seed
@@ -30,6 +31,21 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+## Playwright testing
+
+- Run all end-to-end tests locally with `npm run test:e2e`
+- Run smoke-only tests with `npm run test:e2e:smoke`
+- Run the Playwright UI runner with `npm run test:e2e:ui`
+- To test a deployed environment, set `PLAYWRIGHT_BASE_URL`, for example:
+
+```bash
+PLAYWRIGHT_BASE_URL="https://monitor-ecru.vercel.app" npm run test:e2e:smoke
+```
+
+- GitHub Actions includes:
+  - `.github/workflows/ci-playwright.yml` for local CI coverage on pushes and pull requests
+  - `.github/workflows/post-deploy-e2e.yml` for smoke and CRUD E2E checks against the deployed Vercel URL
 
 ## Notes
 

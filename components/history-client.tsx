@@ -35,7 +35,7 @@ function UptimeLineChart({ points }: { points: HistoryData["timeline"] }) {
     .join(" ");
 
   return (
-    <div className="space-y-4">
+      <div className="space-y-4" data-testid="uptime-chart-legend">
       <div className="h-[240px] w-full overflow-hidden rounded-2xl border border-border bg-slate-950 p-4">
         <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full">
           {[0.25, 0.5, 0.75].map((level) => (
@@ -134,7 +134,7 @@ export function HistoryClient({ initialData }: { initialData: HistoryData }) {
         })}
       </div>
 
-      <Card className="border-0 bg-white">
+      <Card className="border-0 bg-white" data-testid="history-summary">
         <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <CardTitle>Uptime history</CardTitle>
@@ -142,6 +142,7 @@ export function HistoryClient({ initialData }: { initialData: HistoryData }) {
           </div>
           <div className="flex flex-col gap-3 md:flex-row">
             <Select
+              data-testid="history-company-filter"
               value={companyId}
               onChange={(event) => {
                 const nextCompanyId = event.target.value;
@@ -158,6 +159,7 @@ export function HistoryClient({ initialData }: { initialData: HistoryData }) {
               ))}
             </Select>
             <Select
+              data-testid="history-endpoint-filter"
               value={endpointId}
               onChange={(event) => {
                 const nextEndpointId = event.target.value;
@@ -172,14 +174,14 @@ export function HistoryClient({ initialData }: { initialData: HistoryData }) {
                 </option>
               ))}
             </Select>
-            <Button variant="outline" onClick={() => refresh()} disabled={pending}>
+            <Button data-testid="history-refresh-button" variant="outline" onClick={() => refresh()} disabled={pending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${pending ? "animate-spin" : ""}`} />
               Refresh
             </Button>
           </div>
         </CardHeader>
         <CardContent className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
-          <div>
+          <div data-testid="uptime-chart">
             <UptimeLineChart points={data.timeline} />
           </div>
           <div className="space-y-4">
@@ -213,7 +215,7 @@ export function HistoryClient({ initialData }: { initialData: HistoryData }) {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
+            <Table data-testid="recent-checks-table">
               <TableHeader>
                 <TableRow>
                   <TableHead>Checked at</TableHead>

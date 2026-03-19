@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum EndpointType {
+  web
+  api
+}
+
+enum EndpointState {
+  OK
+  WARNING
+  DOWN
+  UNKNOWN
+}
+
+model Company {
+  id        String     @id @default(cuid())
+  name      String
+  taxCode   String?
+  address   String?
+  note      String?
+  endpoints Endpoint[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Endpoint {
+  id               String          @id @default(cuid())
+  companyId        String
+  company          Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  url              String
+  type             EndpointType
+  active           Boolean         @default(true)
+  currentStatus    EndpointState   @default(UNKNOWN)
+  lastResponseTime Int?
+  lastCheckedAt    DateTime?
+  lastHttpCode     Int?
+  lastError        String?
+  lastAlertState   EndpointState?
+  lastNotifiedAt   DateTime?
+  statuses         EndpointStatus[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model EndpointStatus {
+  id           String        @id @default(cuid())
+  endpointId   String
+  endpoint     Endpoint      @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  status       EndpointState
+  responseTime Int?
+  httpCode     Int?
+  message      String?
+  checkedAt    DateTime      @default(now())
+}
+
+model Settings {
+  id               String    @id @default("default")
+  telegramBotToken String?
+  telegramChatId   String?
+  intervalSeconds  Int       @default(300)
+  timeoutMs        Int       @default(10000)
+  warningThreshold Int       @default(2500)
+  lastMonitoringAt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}

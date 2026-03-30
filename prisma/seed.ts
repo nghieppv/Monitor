@@ -1,4 +1,4 @@
-import { PrismaClient, EndpointState, EndpointType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -15,10 +15,10 @@ async function main() {
   });
 
   const acme = await prisma.company.upsert({
-    where: { id: "seed-company-acme" },
+    where: { id: "00000000-0000-0000-0000-000000000001" },
     update: {},
     create: {
-      id: "seed-company-acme",
+      id: "00000000-0000-0000-0000-000000000001",
       name: "Acme Logistics",
       taxCode: "TAX-ACME-01",
       address: "12 Harbor View, Singapore",
@@ -27,10 +27,10 @@ async function main() {
   });
 
   const nova = await prisma.company.upsert({
-    where: { id: "seed-company-nova" },
+    where: { id: "00000000-0000-0000-0000-000000000002" },
     update: {},
     create: {
-      id: "seed-company-nova",
+      id: "00000000-0000-0000-0000-000000000002",
       name: "Nova Finance",
       taxCode: "TAX-NOVA-18",
       address: "88 Market Street, Hanoi",
@@ -39,28 +39,28 @@ async function main() {
   });
 
   await prisma.endpoint.upsert({
-    where: { id: "seed-endpoint-acme-web" },
+    where: { id: "00000000-0000-0000-0000-000000000011" },
     update: {},
     create: {
-      id: "seed-endpoint-acme-web",
+      id: "00000000-0000-0000-0000-000000000011",
       companyId: acme.id,
       url: "https://example.com",
-      type: EndpointType.web,
+      type: "web",
       active: true,
-      currentStatus: EndpointState.UNKNOWN,
+      currentStatus: "UNKNOWN",
     },
   });
 
   await prisma.endpoint.upsert({
-    where: { id: "seed-endpoint-nova-api" },
+    where: { id: "00000000-0000-0000-0000-000000000012" },
     update: {},
     create: {
-      id: "seed-endpoint-nova-api",
+      id: "00000000-0000-0000-0000-000000000012",
       companyId: nova.id,
       url: "https://jsonplaceholder.typicode.com/posts/1",
-      type: EndpointType.api,
+      type: "api",
       active: true,
-      currentStatus: EndpointState.UNKNOWN,
+      currentStatus: "UNKNOWN",
     },
   });
 }

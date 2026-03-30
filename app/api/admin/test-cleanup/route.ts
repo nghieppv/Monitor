@@ -1,5 +1,5 @@
-import { fail, ok, handleRouteError } from "@/lib/api";
-import { prisma } from "@/lib/prisma";
+import { fail, ok } from "@/lib/api";
+import { query } from "@/lib/mssql";
 import { hasValidCronSecret } from "@/lib/runtime";
 
 export async function POST(request: Request) {
@@ -15,23 +15,19 @@ export async function POST(request: Request) {
       return fail("A safe pw-e2e prefix is required", 400);
     }
 
-    await prisma.endpoint.deleteMany({
-      where: {
-        OR: [
-          { url: { contains: prefix } },
-          { company: { name: { startsWith: prefix } } },
-        ],
-      },
-    });
-
-    await prisma.company.deleteMany({
-      where: {
-        name: { startsWith: prefix },
-      },
-    });
+    // MSSQL-based cleanup: delete matching EndpointStatus/Endpoint/Company rows
+    await query(`DELETE FROM EndpointStatus WHERE endpointId IN (SELECT id FROM Endpoint WHERE companyId IN (SELECT id FROM Company WHERE name LIKE @prefix))`, [
+      { name: "prefix", value: `${prefix}%`, type: (require('mssql') as any).VarChar }
+    ]);
+    await query(`DELETE FROM Endpoint WHERE companyId IN (SELECT id FROM Company WHERE name LIKE @prefix)`, [
+      { name: "prefix", value: `${prefix}%`, type: (require('mssql') as any).VarChar }
+    ]);
+    await query(`DELETE FROM Company WHERE name LIKE @prefix`, [
+      { name: "prefix", value: `${prefix}%`, type: (require('mssql') as any).VarChar }
+    ]);
 
     return ok({ success: true, cleanedPrefix: prefix });
   } catch (error) {
-    return handleRouteError(error);
+    return fail("Internal server error");
   }
 }

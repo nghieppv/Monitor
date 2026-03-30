@@ -1,132 +1,78 @@
-import { fail, ok, handleRouteError } from "@/lib/api";
-import { prisma } from "@/lib/prisma";
+import { fail, ok } from "@/lib/api";
+import { query } from "@/lib/mssql";
 import { hasValidCronSecret } from "@/lib/runtime";
-
-async function ensureEnums() {
-  await prisma.$executeRawUnsafe(`
-    DO $$
-    BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'EndpointType') THEN
-        CREATE TYPE "EndpointType" AS ENUM ('web', 'api');
-      END IF;
-    END $$;
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    DO $$
-    BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'EndpointState') THEN
-        CREATE TYPE "EndpointState" AS ENUM ('OK', 'WARNING', 'DOWN', 'UNKNOWN');
-      END IF;
-    END $$;
-  `);
-}
-
-async function ensureTables() {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Company" (
-      "id" TEXT PRIMARY KEY,
-      "name" TEXT NOT NULL,
-      "taxCode" TEXT,
-      "address" TEXT,
-      "note" TEXT,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Endpoint" (
-      "id" TEXT PRIMARY KEY,
-      "companyId" TEXT NOT NULL,
-      "url" TEXT NOT NULL,
-      "type" "EndpointType" NOT NULL,
-      "active" BOOLEAN NOT NULL DEFAULT true,
-      "currentStatus" "EndpointState" NOT NULL DEFAULT 'UNKNOWN',
-      "lastResponseTime" INTEGER,
-      "lastCheckedAt" TIMESTAMP(3),
-      "lastHttpCode" INTEGER,
-      "lastError" TEXT,
-      "lastAlertState" "EndpointState",
-      "lastNotifiedAt" TIMESTAMP(3),
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT "Endpoint_companyId_fkey"
-        FOREIGN KEY ("companyId") REFERENCES "Company"("id")
-        ON DELETE CASCADE ON UPDATE CASCADE
-    )
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "EndpointStatus" (
-      "id" TEXT PRIMARY KEY,
-      "endpointId" TEXT NOT NULL,
-      "status" "EndpointState" NOT NULL,
-      "responseTime" INTEGER,
-      "httpCode" INTEGER,
-      "message" TEXT,
-      "checkedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT "EndpointStatus_endpointId_fkey"
-        FOREIGN KEY ("endpointId") REFERENCES "Endpoint"("id")
-        ON DELETE CASCADE ON UPDATE CASCADE
-    )
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Settings" (
-      "id" TEXT PRIMARY KEY DEFAULT 'default',
-      "telegramBotToken" TEXT,
-      "telegramChatId" TEXT,
-      "intervalSeconds" INTEGER NOT NULL DEFAULT 300,
-      "timeoutMs" INTEGER NOT NULL DEFAULT 10000,
-      "warningThreshold" INTEGER NOT NULL DEFAULT 2500,
-      "lastMonitoringAt" TIMESTAMP(3),
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Endpoint_companyId_idx" ON "Endpoint" ("companyId")`);
-  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "EndpointStatus_endpointId_idx" ON "EndpointStatus" ("endpointId")`);
-  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "EndpointStatus_checkedAt_idx" ON "EndpointStatus" ("checkedAt")`);
-}
-
-async function seedDefaults() {
-  await prisma.$executeRawUnsafe(`
-    INSERT INTO "Settings" ("id", "intervalSeconds", "timeoutMs", "warningThreshold")
-    VALUES ('default', 300, 10000, 2500)
-    ON CONFLICT ("id") DO NOTHING
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    INSERT INTO "Company" ("id", "name", "taxCode", "address", "note")
-    VALUES
-      ('seed-company-acme', 'Acme Logistics', 'TAX-ACME-01', '12 Harbor View, Singapore', 'Core customer services'),
-      ('seed-company-nova', 'Nova Finance', 'TAX-NOVA-18', '88 Market Street, Hanoi', 'Public API surfaces')
-    ON CONFLICT ("id") DO NOTHING
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    INSERT INTO "Endpoint" ("id", "companyId", "url", "type", "active", "currentStatus")
-    VALUES
-      ('seed-endpoint-acme-web', 'seed-company-acme', 'https://example.com', 'web', true, 'UNKNOWN'),
-      ('seed-endpoint-nova-api', 'seed-company-nova', 'https://jsonplaceholder.typicode.com/posts/1', 'api', true, 'UNKNOWN')
-    ON CONFLICT ("id") DO NOTHING
-  `);
-}
 
 export async function POST(request: Request) {
   try {
     if (!hasValidCronSecret(request)) {
       return fail("Unauthorized", 401);
     }
-
-    await ensureEnums();
-    await ensureTables();
-    await seedDefaults();
-
+    // Create MSSQL tables if not exist (raw SQL)
+    await query(`IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Company')
+    BEGIN
+      CREATE TABLE Company (
+        id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        name NVARCHAR(255) NOT NULL,
+        taxCode NVARCHAR(100) NULL,
+        address NVARCHAR(255) NULL,
+        note NVARCHAR(MAX) NULL,
+        createdAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+        updatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+      )
+    END`);
+    await query(`IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Endpoint')
+    BEGIN
+      CREATE TABLE Endpoint (
+        id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        companyId UNIQUEIDENTIFIER NOT NULL,
+        url NVARCHAR(2048) NOT NULL,
+        type NVARCHAR(50) NOT NULL,
+        active BIT NOT NULL DEFAULT 1,
+        currentStatus NVARCHAR(50) NOT NULL DEFAULT 'UNKNOWN',
+        lastResponseTime INT NULL,
+        lastCheckedAt DATETIME2 NULL,
+        lastHttpCode INT NULL,
+        lastError NVARCHAR(MAX) NULL,
+        lastAlertState NVARCHAR(50) NULL,
+        lastNotifiedAt DATETIME2 NULL,
+        createdAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+        updatedAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_Endpoint_Company FOREIGN KEY (companyId) REFERENCES Company(id) ON DELETE CASCADE
+      )
+    END`);
+    await query(`IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'EndpointStatus')
+    BEGIN
+      CREATE TABLE EndpointStatus (
+        id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        endpointId UNIQUEIDENTIFIER NOT NULL,
+        status NVARCHAR(50) NOT NULL,
+        responseTime INT NULL,
+        httpCode INT NULL,
+        message NVARCHAR(MAX) NULL,
+        checkedAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_EndpointStatus_Endpoint FOREIGN KEY (endpointId) REFERENCES Endpoint(id) ON DELETE CASCADE
+      )
+    END`);
+    await query(`IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Settings')
+    BEGIN
+      CREATE TABLE Settings (
+        id NVARCHAR(50) PRIMARY KEY DEFAULT 'default',
+        telegramBotToken NVARCHAR(255) NULL,
+        telegramChatId NVARCHAR(255) NULL,
+        intervalSeconds INT NOT NULL DEFAULT 300,
+        timeoutMs INT NOT NULL DEFAULT 10000,
+        warningThreshold INT NOT NULL DEFAULT 2500,
+        lastMonitoringAt DATETIME2 NULL,
+        createdAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+        updatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+      )
+    END`);
+    // Seed default
+    await query(`IF NOT EXISTS (SELECT 1 FROM Settings WHERE id = 'default')
+      INSERT INTO Settings (id, intervalSeconds, timeoutMs, warningThreshold) VALUES ('default', 300, 10000, 2500)
+    `);
     return ok({ success: true, initialized: true });
   } catch (error) {
-    return handleRouteError(error);
+    return fail("Internal server error");
   }
 }

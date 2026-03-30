@@ -1,10 +1,11 @@
-import { startMonitoringWorker } from "@/lib/monitoring";
-import { isNodeRuntime, isVercelEnvironment } from "@/lib/runtime";
-
+// Lazy/server-only import to avoid pulling Node/MSSQL libs into client bundle
 export async function register() {
-  if (!isNodeRuntime() || isVercelEnvironment()) {
+  if (typeof window !== "undefined") {
+    // Ensure this runs only on server
     return;
   }
-
-  await startMonitoringWorker();
+  const mod = await import("@/lib/monitoring");
+  if (typeof mod.startMonitoringWorker === "function") {
+    await mod.startMonitoringWorker();
+  }
 }

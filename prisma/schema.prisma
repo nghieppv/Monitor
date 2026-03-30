@@ -3,25 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
-enum EndpointType {
-  web
-  api
-}
-
-enum EndpointState {
-  OK
-  WARNING
-  DOWN
-  UNKNOWN
-}
+// Enums are not supported for SQL Server; use strings with validation instead
 
 model Company {
-  id        String     @id @default(cuid())
+  id        String     @id @default(uuid())
   name      String
   taxCode   String?
   address   String?
@@ -32,18 +21,18 @@ model Company {
 }
 
 model Endpoint {
-  id               String          @id @default(cuid())
+  id               String          @id @default(uuid())
   companyId        String
   company          Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   url              String
-  type             EndpointType
+  type             String
   active           Boolean         @default(true)
-  currentStatus    EndpointState   @default(UNKNOWN)
+  currentStatus    String          @default("UNKNOWN")
   lastResponseTime Int?
   lastCheckedAt    DateTime?
   lastHttpCode     Int?
   lastError        String?
-  lastAlertState   EndpointState?
+  lastAlertState   String?
   lastNotifiedAt   DateTime?
   statuses         EndpointStatus[]
   createdAt        DateTime        @default(now())
@@ -51,10 +40,10 @@ model Endpoint {
 }
 
 model EndpointStatus {
-  id           String        @id @default(cuid())
+  id           String        @id @default(uuid())
   endpointId   String
   endpoint     Endpoint      @relation(fields: [endpointId], references: [id], onDelete: Cascade)
-  status       EndpointState
+  status       String
   responseTime Int?
   httpCode     Int?
   message      String?

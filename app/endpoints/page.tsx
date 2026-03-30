@@ -1,17 +1,11 @@
-import { prisma } from "@/lib/prisma";
 import { SectionHeader } from "@/components/section-header";
 import { EndpointsClient } from "@/components/endpoints-client";
 
 export const dynamic = "force-dynamic";
 
 export default async function EndpointsPage() {
-  const [companies, endpoints] = await Promise.all([
-    prisma.company.findMany({ orderBy: { name: "asc" } }),
-    prisma.endpoint.findMany({
-      include: { company: true },
-      orderBy: [{ company: { name: "asc" } }, { createdAt: "desc" }],
-    }),
-  ]);
+  const companies = await fetch("/api/companies").then((r) => r.json());
+  const endpoints = await fetch("/api/endpoints").then((r) => r.json());
 
   return (
     <div>

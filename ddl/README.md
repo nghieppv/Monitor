@@ -1,0 +1,2 @@
+-- SQL Server DDL for MSSQL setup
+-- Execute ddl/mssql-init.sql to create tables and seed default data

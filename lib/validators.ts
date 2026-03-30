@@ -10,7 +10,7 @@ export const companySchema = z.object({
 export const endpointSchema = z.object({
   companyId: z.string().min(1, "Company is required"),
   url: z.string().url("A valid URL is required"),
-  type: z.enum(["web", "api"]),
+  type: z.string(),
   active: z.boolean().default(true),
 });
 

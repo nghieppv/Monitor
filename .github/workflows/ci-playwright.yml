@@ -12,7 +12,6 @@ jobs:
     timeout-minutes: 30
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
     steps:
       - name: Checkout
@@ -37,6 +36,9 @@ jobs:
         run: npm run build
 
       - name: Run Playwright tests
+        env:
+          PLAYWRIGHT_BASE_URL: https://monitor-ecru.vercel.app
+          PLAYWRIGHT_CLEANUP_SECRET: ${{ secrets.CRON_SECRET }}
         run: npm run test:e2e
 
       - name: Upload Playwright report

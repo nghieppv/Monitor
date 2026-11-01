@@ -52,7 +52,8 @@ async function sendTelegramMessage(botToken: string, chatId: string, text: strin
 
 async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: EndpointState) {
   const settings = await getSettings();
-  if (!settings.telegramBotToken || !settings.telegramChatId) return;
+  const chatId = endpoint.company.telegramChatId || settings.telegramChatId;
+  if (!settings.telegramBotToken || !chatId) return;
 
   const isDownTransition = nextState === EndpointState.DOWN && endpoint.lastAlertState !== EndpointState.DOWN;
   const isRecoveryTransition =
@@ -68,7 +69,7 @@ async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: Endpoint
     `Status: ${nextState}`,
   ].join("\n");
 
-  await sendTelegramMessage(settings.telegramBotToken, settings.telegramChatId, text);
+  await sendTelegramMessage(settings.telegramBotToken, chatId, text);
 
   await prisma.endpoint.update({
     where: { id: endpoint.id },

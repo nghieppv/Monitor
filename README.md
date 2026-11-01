@@ -45,7 +45,7 @@ PLAYWRIGHT_BASE_URL="https://monitor-ecru.vercel.app" npm run test:e2e:smoke
 
 - GitHub Actions includes:
   - `.github/workflows/ci-playwright.yml` for local CI coverage on pushes and pull requests
-  - `.github/workflows/post-deploy-e2e.yml` for smoke and CRUD E2E checks against the deployed Vercel URL
+  - `.github/workflows/post-deploy-smoke.yml` for read-only smoke tests against the deployed Vercel URL
 
 ## Notes
 

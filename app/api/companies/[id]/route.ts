@@ -28,6 +28,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         taxCode: payload.tax_code || null,
         address: payload.address || null,
         note: payload.note || null,
+        telegramChatId: payload.telegram_chat_id || null,
       },
     });
 

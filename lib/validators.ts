@@ -5,6 +5,7 @@ export const companySchema = z.object({
   tax_code: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   note: z.string().optional().nullable(),
+  telegram_chat_id: z.string().optional().nullable(),
 });
 
 export const endpointSchema = z.object({

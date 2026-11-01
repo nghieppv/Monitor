@@ -25,8 +25,9 @@ model Company {
   name      String
   taxCode   String?
   address   String?
-  note      String?
-  endpoints Endpoint[]
+  note             String?
+  telegramChatId   String?
+  endpoints        Endpoint[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }

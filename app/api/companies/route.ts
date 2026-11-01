@@ -24,6 +24,7 @@ export async function POST(request: Request) {
         taxCode: payload.tax_code || null,
         address: payload.address || null,
         note: payload.note || null,
+        telegramChatId: payload.telegram_chat_id || null,
       },
     });
 

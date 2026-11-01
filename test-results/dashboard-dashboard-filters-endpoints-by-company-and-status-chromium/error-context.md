@@ -1,0 +1,169 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - paragraph [ref=e6]: Monitor Hub
+        - heading "Operations Console" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Live endpoint health, company ownership, and alert settings.
+      - navigation [ref=e9]:
+        - link "Dashboard" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+          - text: Dashboard
+        - link "Companies" [ref=e16] [cursor=pointer]:
+          - /url: /companies
+          - img [ref=e17]
+          - text: Companies
+        - link "Endpoints" [ref=e21] [cursor=pointer]:
+          - /url: /endpoints
+          - img [ref=e22]
+          - text: Endpoints
+        - link "History" [ref=e29] [cursor=pointer]:
+          - /url: /history
+          - img [ref=e30]
+          - text: History
+        - link "Settings" [ref=e33] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e34]
+          - text: Settings
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - paragraph [ref=e40]: Monitoring dashboard
+          - heading "Health overview" [level=2] [ref=e41]
+          - paragraph [ref=e42]: Track every endpoint, filter the fleet by ownership or status, and trigger fresh checks from one operational console.
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - generic [ref=e46]:
+              - generic [ref=e47]:
+                - paragraph [ref=e48]: Total endpoints
+                - paragraph [ref=e49]: "9"
+              - img [ref=e51]
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - paragraph [ref=e56]: Healthy
+                - paragraph [ref=e57]: "3"
+              - img [ref=e59]
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - paragraph [ref=e65]: Warning
+                - paragraph [ref=e66]: "0"
+              - img [ref=e68]
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - paragraph [ref=e73]: Down
+                - paragraph [ref=e74]: "6"
+              - img [ref=e76]
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - heading "Endpoint health matrix" [level=3] [ref=e83]
+                - paragraph [ref=e84]: Auto-refreshes when the monitoring interval expires. Run a manual check any time.
+              - generic [ref=e85]:
+                - combobox [ref=e86]:
+                  - option "All statuses" [selected]
+                  - option "OK"
+                  - option "Warning"
+                  - option "Down"
+                  - option "Unknown"
+                - combobox [ref=e87]:
+                  - option "All companies" [selected]
+                  - option "Connell Vietnam"
+                  - option "Cấp nước Thủ Đức"
+                  - option "Gamuda Land"
+                  - option "SGS VIETNAM LTD."
+                  - option "VNPT eContract Premium"
+                  - option "VinGroup"
+                - button "Refresh" [ref=e88] [cursor=pointer]:
+                  - img [ref=e89]
+                  - text: Refresh
+                - button "Run checks" [ref=e94] [cursor=pointer]:
+                  - img [ref=e95]
+                  - text: Run checks
+            - table [ref=e102]:
+              - rowgroup [ref=e103]:
+                - row "Company URL Type Status Response time Last checked" [ref=e104]:
+                  - columnheader "Company" [ref=e105]
+                  - columnheader "URL" [ref=e106]
+                  - columnheader "Type" [ref=e107]
+                  - columnheader "Status" [ref=e108]
+                  - columnheader "Response time" [ref=e109]
+                  - columnheader "Last checked" [ref=e110]
+              - rowgroup [ref=e111]:
+                - row "Connell Vietnam https://connell.vnpt-dochub.vn web OK 1210 ms 19 Mar 2026, 16:17" [ref=e112]:
+                  - cell "Connell Vietnam" [ref=e113]
+                  - cell "https://connell.vnpt-dochub.vn" [ref=e114]
+                  - cell "web" [ref=e115]
+                  - cell "OK" [ref=e116]:
+                    - generic [ref=e117]: OK
+                  - cell "1210 ms" [ref=e118]
+                  - cell "19 Mar 2026, 16:17" [ref=e119]
+                - row "Cấp nước Thủ Đức https://edoc.capnuocthuduc.vn web Down 10002 ms 19 Mar 2026, 16:17" [ref=e120]:
+                  - cell "Cấp nước Thủ Đức" [ref=e121]
+                  - cell "https://edoc.capnuocthuduc.vn" [ref=e122]
+                  - cell "web" [ref=e123]
+                  - cell "Down" [ref=e124]:
+                    - generic [ref=e125]: Down
+                  - cell "10002 ms" [ref=e126]
+                  - cell "19 Mar 2026, 16:17" [ref=e127]
+                - row "Gamuda Land https://econtract.gamudaland.com.vn web OK 744 ms 19 Mar 2026, 16:17" [ref=e128]:
+                  - cell "Gamuda Land" [ref=e129]
+                  - cell "https://econtract.gamudaland.com.vn" [ref=e130]
+                  - cell "web" [ref=e131]
+                  - cell "OK" [ref=e132]:
+                    - generic [ref=e133]: OK
+                  - cell "744 ms" [ref=e134]
+                  - cell "19 Mar 2026, 16:17" [ref=e135]
+                - row "SGS VIETNAM LTD. https://vn-econtract.sgs.com web OK 717 ms 19 Mar 2026, 16:17" [ref=e136]:
+                  - cell "SGS VIETNAM LTD." [ref=e137]
+                  - cell "https://vn-econtract.sgs.com" [ref=e138]
+                  - cell "web" [ref=e139]
+                  - cell "OK" [ref=e140]:
+                    - generic [ref=e141]: OK
+                  - cell "717 ms" [ref=e142]
+                  - cell "19 Mar 2026, 16:17" [ref=e143]
+                - row "VNPT eContract Premium https://econtract-premium-api.vnpt.vn/healthz api Down 10001 ms 19 Mar 2026, 16:13" [ref=e144]:
+                  - cell "VNPT eContract Premium" [ref=e145]
+                  - cell "https://econtract-premium-api.vnpt.vn/healthz" [ref=e146]
+                  - cell "api" [ref=e147]
+                  - cell "Down" [ref=e148]:
+                    - generic [ref=e149]: Down
+                  - cell "10001 ms" [ref=e150]
+                  - cell "19 Mar 2026, 16:13" [ref=e151]
+                - row "VNPT eContract Premium https://econtract-premium-docs.vnpt.vn/ web Down 10001 ms 19 Mar 2026, 16:17" [ref=e152]:
+                  - cell "VNPT eContract Premium" [ref=e153]
+                  - cell "https://econtract-premium-docs.vnpt.vn/" [ref=e154]
+                  - cell "web" [ref=e155]
+                  - cell "Down" [ref=e156]:
+                    - generic [ref=e157]: Down
+                  - cell "10001 ms" [ref=e158]
+                  - cell "19 Mar 2026, 16:17" [ref=e159]
+                - row "VNPT eContract Premium https://econtract-premium.vnpt.vn web Down 10002 ms 19 Mar 2026, 16:17" [ref=e160]:
+                  - cell "VNPT eContract Premium" [ref=e161]
+                  - cell "https://econtract-premium.vnpt.vn" [ref=e162]
+                  - cell "web" [ref=e163]
+                  - cell "Down" [ref=e164]:
+                    - generic [ref=e165]: Down
+                  - cell "10002 ms" [ref=e166]
+                  - cell "19 Mar 2026, 16:17" [ref=e167]
+                - row "VNPT eContract Premium https://econtract-premium.vnpt.vnn web Down 7 ms 19 Mar 2026, 16:17" [ref=e168]:
+                  - cell "VNPT eContract Premium" [ref=e169]
+                  - cell "https://econtract-premium.vnpt.vnn" [ref=e170]
+                  - cell "web" [ref=e171]
+                  - cell "Down" [ref=e172]:
+                    - generic [ref=e173]: Down
+                  - cell "7 ms" [ref=e174]
+                  - cell "19 Mar 2026, 16:17" [ref=e175]
+                - row "VinGroup https://econtract.vingroup.net web Down 10001 ms 19 Mar 2026, 16:17" [ref=e176]:
+                  - cell "VinGroup" [ref=e177]
+                  - cell "https://econtract.vingroup.net" [ref=e178]
+                  - cell "web" [ref=e179]
+                  - cell "Down" [ref=e180]:
+                    - generic [ref=e181]: Down
+                  - cell "10001 ms" [ref=e182]
+                  - cell "19 Mar 2026, 16:17" [ref=e183]
+  - alert [ref=e184]
+```

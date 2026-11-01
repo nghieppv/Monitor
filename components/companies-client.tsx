@@ -15,10 +15,11 @@ type Company = {
   taxCode: string | null;
   address: string | null;
   note: string | null;
+  telegramChatId: string | null;
   _count: { endpoints: number };
 };
 
-const blankForm = { name: "", tax_code: "", address: "", note: "" };
+const blankForm = { name: "", tax_code: "", address: "", note: "", telegram_chat_id: "" };
 
 export function CompaniesClient({ initialCompanies }: { initialCompanies: Company[] }) {
   const [companies, setCompanies] = useState(initialCompanies);
@@ -54,6 +55,7 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
       tax_code: company.taxCode ?? "",
       address: company.address ?? "",
       note: company.note ?? "",
+      telegram_chat_id: company.telegramChatId ?? "",
     });
   }
 
@@ -81,6 +83,13 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
             <Input data-testid="company-tax-code-input" placeholder="Tax code" value={form.tax_code} onChange={(e) => setForm({ ...form, tax_code: e.target.value })} />
             <Input data-testid="company-address-input" placeholder="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             <Textarea data-testid="company-note-input" placeholder="Notes" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+            <Input
+              data-testid="company-telegram-chat-id-input"
+              placeholder="Company Telegram group chat ID (optional)"
+              value={form.telegram_chat_id}
+              onChange={(e) => setForm({ ...form, telegram_chat_id: e.target.value })}
+            />
+            <p className="text-xs text-slate-500">If empty, alerts use the shared Telegram group configured in Settings.</p>
             <div className="flex gap-3">
               <Button data-testid="company-submit-button" type="submit" disabled={busy}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -117,6 +126,7 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
                   <TableHead>Tax code</TableHead>
                   <TableHead>Address</TableHead>
                   <TableHead>Endpoints</TableHead>
+                  <TableHead>Telegram</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -127,6 +137,7 @@ export function CompaniesClient({ initialCompanies }: { initialCompanies: Compan
                     <TableCell>{company.taxCode || "-"}</TableCell>
                     <TableCell>{company.address || "-"}</TableCell>
                     <TableCell>{company._count.endpoints}</TableCell>
+                    <TableCell className="max-w-40 truncate" title={company.telegramChatId ?? undefined}>{company.telegramChatId || "Shared group"}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button data-testid="company-edit-button" size="sm" variant="outline" onClick={() => edit(company)}>

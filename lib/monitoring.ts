@@ -37,6 +37,18 @@ function deriveState(httpCode: number | null, responseTime: number, warningThres
   return EndpointState.DOWN;
 }
 
+function formatTelegramTime(date: Date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const hour12 = hours % 12 || 12;
+  const period = hours >= 12 ? "PM" : "AM";
+
+  return `${day}/${month}/${year} ${hour12}:${minutes} ${period}`;
+}
+
 async function sendTelegramMessage(botToken: string, chatId: string, text: string) {
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
@@ -67,6 +79,7 @@ async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: Endpoint
     `Endpoint: ${endpoint.url}`,
     `Type: ${endpoint.type.toUpperCase()}`,
     `Status: ${nextState}`,
+    `Time: ${formatTelegramTime(new Date())}`,
   ].join("\n");
 
   await sendTelegramMessage(settings.telegramBotToken, chatId, text);

@@ -38,15 +38,18 @@ function deriveState(httpCode: number | null, responseTime: number, warningThres
 }
 
 function formatTelegramTime(date: Date) {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const hour12 = hours % 12 || 12;
-  const period = hours >= 12 ? "PM" : "AM";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
 
-  return `${day}/${month}/${year} ${hour12}:${minutes} ${period}`;
+  return `${values.day}/${values.month}/${values.year} ${values.hour}:${values.minute} ${values.dayPeriod.toUpperCase()} (GMT+7)`;
 }
 
 async function sendTelegramMessage(botToken: string, chatId: string, text: string) {
@@ -62,7 +65,14 @@ async function sendTelegramMessage(botToken: string, chatId: string, text: strin
   }
 }
 
-async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: EndpointState) {
+async function maybeSendAlert(
+  endpoint: EndpointWithCompany,
+  nextState: EndpointState,
+  responseTime: number,
+  httpCode: number | null,
+  errorMessage: string | null,
+  checkedAt: Date,
+) {
   const settings = await getSettings();
   const chatId = endpoint.company.telegramChatId || settings.telegramChatId;
   if (!settings.telegramBotToken || !chatId) return;
@@ -79,7 +89,10 @@ async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: Endpoint
     `Endpoint: ${endpoint.url}`,
     `Type: ${endpoint.type.toUpperCase()}`,
     `Status: ${nextState}`,
-    `Time: ${formatTelegramTime(new Date())}`,
+    `Response time: ${responseTime} ms`,
+    `HTTP status: ${httpCode ?? "N/A"}`,
+    `Error: ${errorMessage ?? "None"}`,
+    `Time: ${formatTelegramTime(checkedAt)}`,
   ].join("\n");
 
   await sendTelegramMessage(settings.telegramBotToken, chatId, text);
@@ -146,7 +159,8 @@ async function checkEndpoint(endpoint: EndpointWithCompany, timeoutMs: number, w
     }),
   ]);
 
-  await maybeSendAlert(endpoint, nextState);
+  await maybeSendAlert(endpoint, nextState, responseTime, httpCode, message, checkedAt);
+
 }
 
 export async function runMonitoringCycle(force = false) {

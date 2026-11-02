@@ -38,15 +38,18 @@ function deriveState(httpCode: number | null, responseTime: number, warningThres
 }
 
 function formatTelegramTime(date: Date) {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const hour12 = hours % 12 || 12;
-  const period = hours >= 12 ? "PM" : "AM";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
 
-  return `${day}/${month}/${year} ${hour12}:${minutes} ${period}`;
+  return `${values.day}/${values.month}/${values.year} ${values.hour}:${values.minute} ${values.dayPeriod.toUpperCase()} (GMT+7)`;
 }
 
 async function sendTelegramMessage(botToken: string, chatId: string, text: string) {

@@ -65,7 +65,14 @@ async function sendTelegramMessage(botToken: string, chatId: string, text: strin
   }
 }
 
-async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: EndpointState) {
+async function maybeSendAlert(
+  endpoint: EndpointWithCompany,
+  nextState: EndpointState,
+  responseTime: number,
+  httpCode: number | null,
+  errorMessage: string | null,
+  checkedAt: Date,
+) {
   const settings = await getSettings();
   const chatId = endpoint.company.telegramChatId || settings.telegramChatId;
   if (!settings.telegramBotToken || !chatId) return;
@@ -82,7 +89,10 @@ async function maybeSendAlert(endpoint: EndpointWithCompany, nextState: Endpoint
     `Endpoint: ${endpoint.url}`,
     `Type: ${endpoint.type.toUpperCase()}`,
     `Status: ${nextState}`,
-    `Time: ${formatTelegramTime(new Date())}`,
+    `Response time: ${responseTime} ms`,
+    `HTTP status: ${httpCode ?? "N/A"}`,
+    `Error: ${errorMessage ?? "None"}`,
+    `Time: ${formatTelegramTime(checkedAt)}`,
   ].join("\n");
 
   await sendTelegramMessage(settings.telegramBotToken, chatId, text);
@@ -149,7 +159,8 @@ async function checkEndpoint(endpoint: EndpointWithCompany, timeoutMs: number, w
     }),
   ]);
 
-  await maybeSendAlert(endpoint, nextState);
+  await maybeSendAlert(endpoint, nextState, responseTime, httpCode, message, checkedAt);
+
 }
 
 export async function runMonitoringCycle(force = false) {
